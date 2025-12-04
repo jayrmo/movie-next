@@ -11,7 +11,8 @@
   "dependencies": {
     "@heroui/react": "^2.8.5",
     "framer-motion": "^12.23.25",
-    "next": "16.0.6",
+    "mongoose": "^9.0.0",
+    "next": "^16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },

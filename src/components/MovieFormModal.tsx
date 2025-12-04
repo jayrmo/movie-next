@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Modal,
@@ -9,26 +9,27 @@ import {
   Input,
   Textarea,
   Checkbox,
-} from '@heroui/react'
-import { Button } from './Button'
-import { useState } from 'react'
+} from "@heroui/react";
+import { Button } from "./Button";
+import { useState } from "react";
 
 interface MovieFormModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (movieData: MovieFormData) => void
-  initialData?: MovieFormData
-  mode: 'create' | 'edit'
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (movieData: MovieFormData) => void;
+  initialData?: MovieFormData;
+  mode: "create" | "edit";
+  isLoading?: boolean;
 }
 
 export interface MovieFormData {
-  title: string
-  releaseDate: string
-  synopsis: string
-  genre: string
-  trailerUrl: string
-  director: string
-  featured?: boolean
+  title: string;
+  releaseDate: string;
+  synopsis: string;
+  genre: string;
+  trailerUrl?: string;
+  director: string;
+  featured?: boolean;
 }
 
 export function MovieFormModal({
@@ -37,28 +38,41 @@ export function MovieFormModal({
   onSubmit,
   initialData,
   mode,
+  isLoading = false,
 }: MovieFormModalProps) {
+  const defaultFormData: MovieFormData = {
+    title: "",
+    releaseDate: "",
+    synopsis: "",
+    genre: "",
+    trailerUrl: "",
+    director: "",
+    featured: false,
+  };
+
   const [formData, setFormData] = useState<MovieFormData>(
-    initialData || {
-      title: '',
-      releaseDate: '',
-      synopsis: '',
-      genre: '',
-      trailerUrl: '',
-      director: '',
-      featured: false,
+    initialData || defaultFormData
+  );
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
+
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    if (initialData) {
+      setFormData(initialData);
     }
-  )
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(formData)
-    onClose()
-  }
+    e.preventDefault();
+    onSubmit(formData);
+  };
 
-  const handleChange = (field: keyof MovieFormData, value: string | number | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  const handleChange = (
+    field: keyof MovieFormData,
+    value: string | number | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   return (
     <Modal
@@ -67,8 +81,8 @@ export function MovieFormModal({
       size="2xl"
       scrollBehavior="inside"
       classNames={{
-        base: 'bg-slate-900',
-        closeButton: 'hidden',
+        base: "bg-slate-900",
+        closeButton: "hidden",
       }}
     >
       <ModalContent>
@@ -83,10 +97,10 @@ export function MovieFormModal({
                 ← Voltar
               </button>
               <h2 className="text-3xl font-bold text-red-500">
-                {mode === 'create' ? 'Adicionar Filme' : 'Editar Filme'}
+                {mode === "create" ? "Adicionar Filme" : "Editar Filme"}
               </h2>
             </ModalHeader>
-            
+
             <ModalBody className="px-6 py-6 bg-slate-900">
               <div className="space-y-6 bg-slate-800 p-8 rounded-lg">
                 <div>
@@ -96,14 +110,15 @@ export function MovieFormModal({
                   <Input
                     placeholder="Digite o título do filme"
                     value={formData.title}
-                    onChange={(e) => handleChange('title', e.target.value)}
+                    onChange={(e) => handleChange("title", e.target.value)}
                     required
                     variant="flat"
                     size="lg"
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -115,14 +130,17 @@ export function MovieFormModal({
                   <Input
                     type="date"
                     value={formData.releaseDate}
-                    onChange={(e) => handleChange('releaseDate', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("releaseDate", e.target.value)
+                    }
                     required
                     variant="flat"
                     size="lg"
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -134,14 +152,15 @@ export function MovieFormModal({
                   <Textarea
                     placeholder="Digite a sinopse do filme"
                     value={formData.synopsis}
-                    onChange={(e) => handleChange('synopsis', e.target.value)}
+                    onChange={(e) => handleChange("synopsis", e.target.value)}
                     required
                     variant="flat"
                     minRows={4}
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -152,14 +171,15 @@ export function MovieFormModal({
                   </label>
                   <Input
                     placeholder="https://youtube.com/..."
-                    value={formData.trailerUrl}
-                    onChange={(e) => handleChange('trailerUrl', e.target.value)}
+                    value={formData.trailerUrl || ""}
+                    onChange={(e) => handleChange("trailerUrl", e.target.value)}
                     variant="flat"
                     size="lg"
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -171,14 +191,15 @@ export function MovieFormModal({
                   <Input
                     placeholder="Nome do diretor"
                     value={formData.director}
-                    onChange={(e) => handleChange('director', e.target.value)}
+                    onChange={(e) => handleChange("director", e.target.value)}
                     required
                     variant="flat"
                     size="lg"
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -190,14 +211,15 @@ export function MovieFormModal({
                   <Input
                     placeholder="Ação, Drama, etc."
                     value={formData.genre}
-                    onChange={(e) => handleChange('genre', e.target.value)}
+                    onChange={(e) => handleChange("genre", e.target.value)}
                     required
                     variant="flat"
                     size="lg"
                     classNames={{
-                      base: 'w-full',
-                      input: 'bg-slate-700 text-white text-base placeholder:text-slate-400',
-                      inputWrapper: 'bg-slate-700 hover:bg-slate-600 border-0',
+                      base: "w-full",
+                      input:
+                        "bg-slate-700 text-white text-base placeholder:text-slate-400",
+                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
                 </div>
@@ -205,39 +227,44 @@ export function MovieFormModal({
                 <div className="pt-4 border-t border-slate-700">
                   <Checkbox
                     isSelected={formData.featured || false}
-                    onValueChange={(checked) => handleChange('featured', checked)}
+                    onValueChange={(checked) =>
+                      handleChange("featured", checked)
+                    }
                     classNames={{
-                      wrapper: 'bg-slate-700 border-slate-600',
+                      wrapper: "bg-slate-700 border-slate-600",
                     }}
                   >
                     <span className="text-white font-medium">
-                      Marcar como destaque (aparecerá em destaque na página inicial)
+                      Marcar como destaque (aparecerá em destaque na página
+                      inicial)
                     </span>
                   </Checkbox>
                 </div>
               </div>
             </ModalBody>
-            
+
             <ModalFooter className="px-6 py-4 bg-slate-900">
-              <Button 
-                color="danger" 
-                variant="light" 
+              <Button
+                color="danger"
+                variant="light"
                 onPress={onClose}
                 className="font-medium"
+                isDisabled={isLoading}
               >
                 Cancelar
               </Button>
-              <Button 
-                color="primary" 
+              <Button
+                color="primary"
                 type="submit"
                 className="font-medium bg-blue-600 hover:bg-blue-700"
+                isLoading={isLoading}
               >
-                {mode === 'create' ? 'Adicionar' : 'Salvar'}
+                {mode === "create" ? "Adicionar" : "Salvar"}
               </Button>
             </ModalFooter>
           </form>
         )}
       </ModalContent>
     </Modal>
-  )
+  );
 }
