@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Navbar as HeroNavbar,
@@ -12,37 +12,72 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-} from '@heroui/react'
-import Link from 'next/link'
-import { ChevronDown, LogOut } from 'lucide-react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+} from "@heroui/react";
+import Link from "next/link";
+import { ChevronDown, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface Category {
+  key: string;
+  label: string;
+}
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const router = useRouter()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/movies");
+        const movies = await res.json();
+
+        const allGenres = new Set<string>();
+        movies.forEach((movie: { genre: string }) => {
+          movie.genre.split(/,\s*|;\s*|\s+e\s+/).forEach((g: string) => {
+            const trimmed = g.trim();
+            if (trimmed) allGenres.add(trimmed);
+          });
+        });
+
+        const cats = Array.from(allGenres).map((genre) => ({
+          key: genre
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, ""),
+          label: genre,
+        }));
+
+        if (isMounted) {
+          setCategories(cats);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar categorias:", error);
+      }
+    }
+
+    fetchCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleLogout = () => {
-    document.cookie = 'isAuthenticated=; path=/; max-age=0'
-    router.push('/login')
-  }
-
-  const categories = [
-    { key: 'action', label: 'Ação' },
-    { key: 'comedy', label: 'Comédia' },
-    { key: 'drama', label: 'Drama' },
-    { key: 'horror', label: 'Terror' },
-    { key: 'scifi', label: 'Ficção Científica' },
-    { key: 'romance', label: 'Romance' },
-    { key: 'thriller', label: 'Suspense' },
-    { key: 'animation', label: 'Animação' },
-  ]
+    document.cookie = "isAuthenticated=; path=/; max-age=0";
+    router.push("/login");
+  };
 
   const crudOptions = [
-    { key: 'list', label: 'Listar Filmes', href: '/movies' },
-    { key: 'create', label: 'Adicionar Filme', href: '/movies/create' },
-    { key: 'edit', label: 'Editar Filmes', href: '/movies/edit' },
-  ]
+    { key: "list", label: "Listar Filmes", href: "/movies" },
+    { key: "create", label: "Adicionar Filme", href: "/movies/create" },
+    { key: "edit", label: "Editar Filmes", href: "/movies/edit" },
+  ];
 
   return (
     <HeroNavbar
@@ -58,7 +93,10 @@ export function Navbar() {
           className="sm:hidden text-white"
         />
         <NavbarBrand>
-          <Link href="/" className="font-bold text-xl text-white hover:text-primary transition-colors">
+          <Link
+            href="/"
+            className="font-bold text-xl text-white hover:text-primary transition-colors"
+          >
             MovieMatch
           </Link>
         </NavbarBrand>
@@ -66,8 +104,8 @@ export function Navbar() {
 
       <NavbarContent className="hidden sm:flex gap-6" justify="center">
         <NavbarItem>
-          <Link 
-            href="/home" 
+          <Link
+            href="/home"
             className="text-white/80 hover:text-white transition-colors"
           >
             Início
@@ -87,7 +125,7 @@ export function Navbar() {
             aria-label="Categorias de filmes"
             className="w-[200px]"
             itemClasses={{
-              base: 'gap-4',
+              base: "gap-4",
             }}
           >
             {categories.map((category) => (
@@ -115,15 +153,11 @@ export function Navbar() {
             aria-label="Gerenciar filmes"
             className="w-[200px]"
             itemClasses={{
-              base: 'gap-4',
+              base: "gap-4",
             }}
           >
             {crudOptions.map((option) => (
-              <DropdownItem
-                key={option.key}
-                as={Link}
-                href={option.href}
-              >
+              <DropdownItem key={option.key} as={Link} href={option.href}>
                 {option.label}
               </DropdownItem>
             ))}
@@ -171,7 +205,9 @@ export function Navbar() {
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <p className="text-zinc-400 text-sm font-semibold mt-4 mb-2">CATEGORIAS</p>
+          <p className="text-zinc-400 text-sm font-semibold mt-4 mb-2">
+            CATEGORIAS
+          </p>
           {categories.map((category) => (
             <Link
               key={category.key}
@@ -184,7 +220,9 @@ export function Navbar() {
           ))}
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <p className="text-zinc-400 text-sm font-semibold mt-4 mb-2">GERENCIAR FILMES</p>
+          <p className="text-zinc-400 text-sm font-semibold mt-4 mb-2">
+            GERENCIAR FILMES
+          </p>
           {crudOptions.map((option) => (
             <Link
               key={option.key}
@@ -207,5 +245,5 @@ export function Navbar() {
         </NavbarMenuItem>
       </NavbarMenu>
     </HeroNavbar>
-  )
+  );
 }
