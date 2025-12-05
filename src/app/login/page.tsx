@@ -16,28 +16,41 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!email || !password) {
+      setError("Por favor, preencha todos os campos");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulação de login
-    setTimeout(() => {
-      if (email && password) {
-        // Aqui você integraria com sua API de autenticação
-        console.log("Login:", { email, password });
-        document.cookie = "isAuthenticated=true; path=/; max-age=86400"; // 24 horas
-        router.push("/home");
-      } else {
-        setError("Por favor, preencha todos os campos");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erro ao fazer login");
+        return;
       }
+
+      router.push("/home");
+    } catch (err) {
+      console.error("Erro no login:", err);
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Background com gradiente */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900/50 to-black z-0" />
 
-      {/* Padrão de fundo */}
       <div
         className="absolute inset-0 opacity-10 z-0"
         style={{
@@ -45,9 +58,7 @@ export default function LoginPage() {
         }}
       />
 
-      {/* Conteúdo */}
       <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Header */}
         <header className="p-6 sm:p-8">
           <div className="flex items-center gap-2">
             <Film className="text-red-600" size={32} />
@@ -55,7 +66,6 @@ export default function LoginPage() {
           </div>
         </header>
 
-        {/* Formulário de Login */}
         <div className="flex flex-1 items-center justify-center px-4 py-12">
           <div className="w-full max-w-md">
             <div className="bg-black/70 backdrop-blur-md rounded-lg p-8 sm:p-12 border border-zinc-800">
@@ -75,9 +85,10 @@ export default function LoginPage() {
                     size="lg"
                     classNames={{
                       label: "text-white font-medium",
-                      input: "bg-zinc-800 text-white",
+                      input:
+                        "!bg-zinc-800 !text-white placeholder:text-zinc-400",
                       inputWrapper:
-                        "bg-zinc-800 border-zinc-700 data-[hover=true]:bg-zinc-700 group-data-[focus=true]:bg-zinc-700",
+                        "!bg-zinc-800 border-zinc-700 hover:!bg-zinc-700 focus-within:!bg-zinc-700 data-[hover=true]:!bg-zinc-700 group-data-[focus=true]:!bg-zinc-700 group-data-[invalid=true]:!bg-zinc-800 group-data-[invalid=true]:border-red-500",
                     }}
                   />
                 </div>
@@ -93,9 +104,10 @@ export default function LoginPage() {
                     size="lg"
                     classNames={{
                       label: "text-white font-medium",
-                      input: "bg-zinc-800 text-white",
+                      input:
+                        "!bg-zinc-800 !text-white placeholder:text-zinc-400",
                       inputWrapper:
-                        "bg-zinc-800 border-zinc-700 data-[hover=true]:bg-zinc-700 group-data-[focus=true]:bg-zinc-700",
+                        "!bg-zinc-800 border-zinc-700 hover:!bg-zinc-700 focus-within:!bg-zinc-700 data-[hover=true]:!bg-zinc-700 group-data-[focus=true]:!bg-zinc-700 group-data-[invalid=true]:!bg-zinc-800 group-data-[invalid=true]:border-red-500",
                     }}
                   />
                 </div>
@@ -126,22 +138,16 @@ export default function LoginPage() {
                     />
                     Lembre-se de mim
                   </label>
-                  <a
-                    href="#"
-                    className="text-zinc-400 hover:text-white transition-colors"
-                  >
-                    Precisa de ajuda?
-                  </a>
                 </div>
 
                 <div className="pt-4 border-t border-zinc-800">
                   <p className="text-zinc-400 text-sm">
                     Novo por aqui?{" "}
                     <a
-                      href="#"
+                      href="/register"
                       className="text-white hover:underline font-semibold"
                     >
-                      Assine agora
+                      Crie sua conta
                     </a>
                   </p>
                 </div>

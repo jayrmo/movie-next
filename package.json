@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.5",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.3",
     "framer-motion": "^12.23.25",
     "mongoose": "^9.0.0",
     "next": "^16.0.7",
