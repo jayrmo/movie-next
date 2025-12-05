@@ -54,6 +54,7 @@ export function MovieFormModal({
     initialData || defaultFormData
   );
   const [prevInitialData, setPrevInitialData] = useState(initialData);
+  const [dateError, setDateError] = useState("");
 
   if (initialData !== prevInitialData) {
     setPrevInitialData(initialData);
@@ -62,15 +63,39 @@ export function MovieFormModal({
     }
   }
 
+  const validateDate = (dateStr: string): boolean => {
+    if (!dateStr) return false;
+    const year = new Date(dateStr).getFullYear();
+    return year >= 1900 && year <= new Date().getFullYear() + 10;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateDate(formData.releaseDate)) {
+      setDateError(
+        "Data deve ser entre 1900 e " + (new Date().getFullYear() + 10)
+      );
+      return;
+    }
+    setDateError("");
     onSubmit(formData);
   };
+
+  const maxDate = `${new Date().getFullYear() + 10}-12-31`;
 
   const handleChange = (
     field: keyof MovieFormData,
     value: string | number | boolean
   ) => {
+    if (field === "releaseDate" && typeof value === "string" && value) {
+      setDateError("");
+      const year = new Date(value).getFullYear();
+      if (year < 1900 || year > new Date().getFullYear() + 10) {
+        setDateError(
+          "Ano deve ser entre 1900 e " + (new Date().getFullYear() + 10)
+        );
+      }
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -133,6 +158,8 @@ export function MovieFormModal({
                     onChange={(e) =>
                       handleChange("releaseDate", e.target.value)
                     }
+                    min="1900-01-01"
+                    max={maxDate}
                     required
                     variant="flat"
                     size="lg"
@@ -140,9 +167,14 @@ export function MovieFormModal({
                       base: "w-full",
                       input:
                         "bg-slate-700 text-white text-base placeholder:text-slate-400",
-                      inputWrapper: "bg-slate-700 hover:bg-slate-600 border-0",
+                      inputWrapper: dateError
+                        ? "bg-slate-700 hover:bg-slate-600 border-2 border-red-500"
+                        : "bg-slate-700 hover:bg-slate-600 border-0",
                     }}
                   />
+                  {dateError && (
+                    <p className="text-red-500 text-sm mt-1">{dateError}</p>
+                  )}
                 </div>
 
                 <div>
