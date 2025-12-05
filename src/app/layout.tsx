@@ -14,8 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MovieMatch",
-  description: "Descubra filmes perfeitos para você",
+  title: {
+    default: "MovieMatch",
+    template: "%s | MovieMatch",
+  },
+  description:
+    "Descubra, organize e compartilhe seus filmes favoritos. Catálogo completo com trailers, sinopses e muito mais.",
+  keywords: ["filmes", "movies", "catálogo", "trailers", "cinema", "séries"],
+  authors: [{ name: "MovieMatch Team" }],
+  openGraph: {
+    title: "MovieMatch",
+    description: "Descubra filmes perfeitos para você",
+    type: "website",
+    locale: "pt_BR",
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +40,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
