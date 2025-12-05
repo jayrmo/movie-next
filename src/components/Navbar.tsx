@@ -14,7 +14,7 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import Link from "next/link";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -23,13 +23,37 @@ interface Category {
   label: string;
 }
 
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
+
+    function getUserFromCookie() {
+      try {
+        const userCookie = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("user="));
+        if (userCookie) {
+          const userData = JSON.parse(
+            decodeURIComponent(userCookie.split("=")[1])
+          );
+          if (isMounted) {
+            setUser(userData);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao ler cookie do usuário:", error);
+      }
+    }
 
     async function fetchCategories() {
       try {
@@ -61,6 +85,7 @@ export function Navbar() {
       }
     }
 
+    getUserFromCookie();
     fetchCategories();
 
     return () => {
@@ -68,8 +93,14 @@ export function Navbar() {
     };
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Erro no logout:", error);
+    }
     document.cookie = "isAuthenticated=; path=/; max-age=0";
+    document.cookie = "user=; path=/; max-age=0";
     router.push("/login");
   };
 
@@ -174,6 +205,14 @@ export function Navbar() {
             Buscar Filme
           </Link>
         </NavbarItem>
+        {user && (
+          <NavbarItem className="hidden sm:flex">
+            <span className="flex items-center gap-2 text-white/80">
+              <User size={18} />
+              {user.name}
+            </span>
+          </NavbarItem>
+        )}
         <NavbarItem className="hidden sm:flex">
           <button
             onClick={handleLogout}
