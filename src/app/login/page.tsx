@@ -129,17 +129,7 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              <div className="mt-8 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 text-zinc-400 cursor-pointer hover:text-zinc-300">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded bg-zinc-800 border-zinc-700"
-                    />
-                    Lembre-se de mim
-                  </label>
-                </div>
-
+              <div className="mt-8">
                 <div className="pt-4 border-t border-zinc-800">
                   <p className="text-zinc-400 text-sm">
                     Novo por aqui?{" "}
