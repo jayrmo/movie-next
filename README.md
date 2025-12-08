@@ -154,7 +154,7 @@ movie/
 - `DELETE /api/movies/[id]` - Deletar filme
 
 ## Deploy
-[Acesse o projeto aqui](https://seu-link-vercel.vercel.app) *(adicione o link após o deploy)*
+[Acesse o projeto aqui] https://movie-next-one.vercel.app/login
 
 ### Como fazer deploy na Vercel:
 
