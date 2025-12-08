@@ -41,9 +41,6 @@ const UserSchema = new Schema<IUserDocument>(
   }
 );
 
-// Índice para busca rápida por email
-UserSchema.index({ email: 1 });
-
 const User: Model<IUserDocument> =
   mongoose.models.User || mongoose.model<IUserDocument>("User", UserSchema);
 
